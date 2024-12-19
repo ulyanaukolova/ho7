@@ -3,27 +3,30 @@ name: Check Style Code
 on:
   push:
     branches:
-      - new_vetochka
+      - vetkas
 
   pull_request:
     branches:
-      - new_vetochka
+      - vetkas
+
 jobs:
-  checkstyle:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
+
     steps:
-      - name: Download code
-        uses: actions/checkout@v2
+    - name: Download code
+      uses: actions/checkout@v2
 
-      - name: Set version python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.11.4'
+    - name: Set version
+      uses: microsoft/setup-msbuild@v7.0.102
 
-      - name: Install dependencies
-        run: |
-          pip install flake8
+    - name: install
+      run: nuget restore TaskManagement.sln
 
-      - name: Run linter
-        run: |
-          flake8 .
+    - name: Build
+      run: |
+        msbuild TaskManagement.sln /p:Configuration=Release
+
+    - name: Run
+      run: |
+        msbuild TaskManagement.sln /p:Configuration=Release /p:RunCodeAnalysis=true
